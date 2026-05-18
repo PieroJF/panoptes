@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="robots" content="index, follow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mi Rutina Gym</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --bg: #0a0a0b;
+    --bg-warm: #0f0e0d;
+    --card: rgba(255,255,255,0.04);
+    --card-hover: rgba(255,255,255,0.07);
+    --card-border: rgba(255,255,255,0.06);
+    --accent: #4ade80;
+    --accent-dim: rgba(74,222,128,0.15);
+    --accent-glow: rgba(74,222,128,0.25);
+    --text: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --text-dim: #666;
+    --push: #f97316;
+    --pull: #3b82f6;
+    --legs: #a855f7;
+    --cardio: #14b8a6;
+    --upper: #eab308;
+    --hiit: #ef4444;
+    --rest: #6b7280;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-full: 9999px;
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.3), 0 0 1px rgba(255,255,255,0.05);
+    --shadow-elevated: 0 8px 32px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.08);
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: 100px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,11,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    padding: 20px 20px 14px;
+    border-bottom: none;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--day-color, var(--accent)) 50%, transparent);
+    opacity: 0.4;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+
+  /* Content */
+  .day-content {
+    display: none;
+    padding: 8px 16px;
+    animation: fadeIn 0.25s ease;
+  }
+  .day-content.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--card) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, var(--day-color, var(--accent)) 0%, transparent 70%);
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .day-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .day-header-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .day-header-text h2 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .day-header-text p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  .tip {
+    background: linear-gradient(135deg, rgba(74,222,128,0.06) 0%, rgba(74,222,128,0.02) 100%);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px;
+    color: rgba(163,228,184,0.9);
+    margin-bottom: 16px;
+    line-height: 1.55;
+    font-weight: 500;
+    box-shadow: inset 0 0 30px rgba(74,222,128,0.02);
+  }
+
+  /* Exercise card */
+  /* Exercise card */
+  .exercise {
+    background: var(--card);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-card);
+    animation: slideUp 0.3s ease both;
+  }
+
+  .exercise:active {
+    transform: scale(0.985);
+    background: var(--card-hover);
+  }
+
+  .exercise-main {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .exercise-num {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: all var(--transition-normal);
+  }
+
+  .exercise-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .exercise-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    transition: all var(--transition-normal);
+  }
+
+  .exercise-detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .exercise-check {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    border: 2px solid rgba(255,255,255,0.12);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-spring);
+  }
+
+  .exercise.done {
+    background: rgba(74,222,128,0.04);
+    border-color: rgba(74,222,128,0.12);
+  }
+
+  .exercise.done .exercise-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .exercise.done .exercise-check::after {
+    content: '✓';
+    color: #000;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .exercise.done .exercise-num {
+    background: rgba(74,222,128,0.12);
+    color: var(--accent);
+  }
+
+  .exercise.done .exercise-name {
+    text-decoration: line-through;
+    opacity: 0.45;
+  }
+
+  .exercise.done .exercise-detail {
+    opacity: 0.35;
+  }
+
+  .yt-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 0, 0, 0.08);
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid rgba(255, 0, 0, 0.1);
+  }
+
+  .yt-btn:active {
+    transform: scale(0.9);
+    background: rgba(255, 0, 0, 0.2);
+  }
+
+  .yt-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Sets badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .badge-sets {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-secondary);
+  }
+
+  .badge-rest {
+    background: rgba(74,222,128,0.08);
+    color: rgba(74,222,128,0.7);
+  }
+
+  /* Section divider */
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    padding: 16px 4px 8px;
+    font-weight: 600;
+  }
+
+  /* Progress ring */
+  .progress-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 4px;
+    margin-bottom: 16px;
+  }
+
+  .progress-ring-wrap {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+    width: 52px;
+    height: 52px;
+  }
+
+  .progress-ring-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 4;
+  }
+
+  .progress-ring-fill {
+    fill: none;
+    stroke: var(--day-color, var(--accent));
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .progress-info {
+    flex: 1;
+  }
+
+  .progress-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .progress-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .progress-section.complete .progress-ring-text {
+    color: var(--accent);
+  }
+
+  .progress-section.complete .progress-label {
+    color: var(--accent);
+  }
+
+  /* Notas section */
+  .notes-section {
+    padding: 16px;
+    margin-top: 8px;
+  }
+
+  .notes-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid var(--card-border);
+  }
+
+  .notes-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .note-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-dim);
+  }
+
+  .note-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .notes-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .notes-toggle {
+    font-size: 12px;
+    color: var(--text-dim);
+    transition: transform var(--transition-normal);
+  }
+
+  .notes-toggle.open {
+    transform: rotate(180deg);
+  }
+
+  .notes-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .notes-body.open {
+    max-height: 300px;
+  }
+
+  .notes-body-inner {
+    padding: 0 16px 14px;
+  }
+
+  /* Reset button */
+  .reset-wrap {
+    text-align: center;
+    padding: 24px 16px;
+  }
+
+  .reset-btn {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-card);
+  }
+
+  .reset-btn:active {
+    transform: scale(0.95);
+    background: var(--card-hover);
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(10,10,11,0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+  }
+
+  .nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+    min-width: 40px;
+  }
+
+  .nav-btn .nav-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .nav-btn.active {
+    color: var(--day-color, var(--accent));
+  }
+
+  .nav-btn.active .nav-icon {
+    transform: scale(1.15);
+  }
+
+  .nav-btn:active {
+    transform: scale(0.9);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💪 Mi Rutina Gym</h1>
+  <p>Fuerza/Piernas/Empuje/Jalón/Posterior + LISS · 6 días</p>
+</div>
+
+<div id="content"></div>
+
+<div class="notes-section">
+  <div class="notes-card">
+    <div class="notes-header" onclick="toggleNotes()">
+      <h3>📋 Recordatorios</h3>
+      <span class="notes-toggle" id="notesToggle">▼</span>
+    </div>
+    <div class="notes-body" id="notesBody">
+      <div class="notes-body-inner">
+        <div class="note-item">
+          <span class="note-icon">🥩</span>
+          <span>Proteína: 160-200g diarios. Si tienes poco apetito, prioriza proteína sobre todo.</span>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">🍚</span>
+          <span>Comida post-entreno: incluye carbohidratos aquí — mejor captación de glucosa.</span>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">💧</span>
+          <span>Mantente bien hidratado. Lleva agua siempre.</span>
+        </div>
+        <div class="note-item">
+          <span class="note-icon">📈</span>
+          <span>Progresión: primero sube reps, luego peso. Cada 4-6 semanas añade 1 serie.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reset-wrap">
+  <button class="reset-btn" onclick="resetAll()">Reiniciar checks</button>
+</div>
+
+<nav class="bottom-nav" id="bottomNav"></nav>
+
+<script>
+const DAYS = [
+  {
+    id: 'mon', label: 'Lun', name: 'FUERZA SUPERIOR', subtitle: 'Compuestos pesados · Pecho · Espalda · Hombros · Delt Lateral',
+    icon: '🏋️', color: 'var(--upper)',
+    tip: 'Cargas pesadas, RIR 1-2. Compuestos con barra primero, accesorios después. Aquí se construye la base.',
+    exercises: [
+      { name: '― CALENTAMIENTO ―', sets: '', rest: '', yt: '' },
+      { name: 'Jumping jacks', sets: '60 seg', rest: '—', yt: 'jumping jacks warm up' },
+      { name: 'Band Pull-Aparts', sets: '2×15', rest: '—', yt: 'band pull aparts warm up shoulder' },
+      { name: 'Band Dislocates (banda o palo)', sets: '1×12', rest: '—', yt: 'band dislocates shoulder mobility' },
+      { name: 'Scapular Push-Ups', sets: '1×10', rest: '—', yt: 'scapular push ups serratus anterior activation' },
+      { name: '― PECHO ―', sets: '', rest: '', yt: '' },
+      { name: 'Bench Press plano (barra)', sets: '4×5-8', rest: '120s', yt: 'bench press barra tecnica correcta' },
+      { name: '― ESPALDA ―', sets: '', rest: '', yt: '' },
+      { name: 'Barbell Bent-Over Row (prono)', sets: '4×6-8', rest: '120s', yt: 'barbell bent over row tecnica correcta' },
+      { name: 'Jalón al pecho (cable)', sets: '3×8-10', rest: '90s', yt: 'lat pulldown jalon al pecho tecnica' },
+      { name: '― HOMBROS ―', sets: '', rest: '', yt: '' },
+      { name: 'Overhead Press de pie (barra)', sets: '3×6-10', rest: '120s', yt: 'overhead press de pie barra tecnica' },
+      { name: 'Cable Lateral Raise (1 brazo)', sets: '4×12-15', rest: '45s', yt: 'cable lateral raise un brazo deltoides tecnica' },
+      { name: '― BÍCEPS / TRÍCEPS ―', sets: '', rest: '', yt: '' },
+      { name: 'SS · Cable Curl (barra EZ)', sets: '3×10-12', rest: '60s', yt: 'cable curl barra ez biceps tecnica' },
+      { name: 'SS · Cable Tricep Pushdown', sets: '3×10-12', rest: '60s', yt: 'cable tricep pushdown tecnica' },
+      { name: '― GRIP / CORE ―', sets: '', rest: '', yt: '' },
+      { name: 'Farmer\'s Walk (mancuernas pesadas)', sets: '3×40m', rest: '90s', yt: 'farmer walk mancuernas pesadas tecnica' },
+      { name: '― ANTEBRAZOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Wrist Curl (barra EZ, borde del banco)', sets: '3×15-20', rest: '60s', yt: 'barbell wrist curl forearm technique' },
+      { name: 'EZ Reverse Curl (de pie, estricto)', sets: '2×8-12', rest: '90s', yt: 'ez bar reverse curl brachioradialis technique' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Chin Tuck Isométrico (flexión craneocervical)', sets: '3×10 (hold 10s)', rest: '60s', yt: 'chin tuck exercise deep neck flexor training' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'tue', label: 'Mar', name: 'PIERNAS (CUÁDRICEPS)', subtitle: 'Sentadilla · Prensa · Hack · Core',
+    icon: '🦵', color: 'var(--legs)',
+    tip: 'Squat pesado primero. RIR 1-2 en compuestos, RIR 0 en aislamiento. Front squat exige core erguido.',
+    exercises: [
+      { name: '― CALENTAMIENTO ―', sets: '', rest: '', yt: '' },
+      { name: 'Bici estacionaria o caminata rápida', sets: '2 min', rest: '—', yt: 'stationary bike warm up legs' },
+      { name: 'Bodyweight Squat con pausa abajo (3s)', sets: '1×8', rest: '—', yt: 'bodyweight squat pause bottom mobility' },
+      { name: 'Walking Lunges con rotación de torso', sets: '6/lado', rest: '—', yt: 'walking lunge torso rotation warm up' },
+      { name: 'Lateral Band Walks (mini-band)', sets: '10/lado', rest: '—', yt: 'lateral band walk glute med activation' },
+      { name: '― CUÁDRICEPS ―', sets: '', rest: '', yt: '' },
+      { name: 'Back Squat (barra)', sets: '4×5-8', rest: '150s', yt: 'barbell back squat tecnica correcta' },
+      { name: 'Front Squat (barra)', sets: '3×6-8', rest: '120s', yt: 'front squat barra tecnica correcta' },
+      { name: 'Leg Press 45° (pies bajos centrados)', sets: '3×10-12', rest: '90s', yt: 'leg press 45 grados cuadriceps tecnica' },
+      { name: 'Hack Squat Machine', sets: '3×10-12', rest: '90s', yt: 'hack squat machine cuadriceps tecnica' },
+      { name: '― CORE ―', sets: '', rest: '', yt: '' },
+      { name: 'Ab Wheel Rollout (anti-extensión)', sets: '3×8-12', rest: '60s', yt: 'ab wheel rollout tecnica correcta' },
+      { name: 'Pallof Press (cable, anti-rotación)', sets: '3×12/lado', rest: '60s', yt: 'pallof press cable anti rotacion tecnica' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Chin Tuck Isométrico (flexión craneocervical)', sets: '3×10 (hold 10s)', rest: '60s', yt: 'chin tuck exercise deep neck flexor training' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'wed', label: 'Mié', name: 'DESCANSO ACTIVO', subtitle: 'Caminata inclinada · 1 hora · Recuperación',
+    icon: '🚶', color: 'var(--cardio)',
+    tip: 'No te sujetes de las barras: anula el trabajo del core y reduce el gasto calórico real. Solo caminar.',
+    exercises: [
+      { name: '― CARDIO LISS ―', sets: '', rest: '', yt: '' },
+      { name: 'Caminata inclinada continua', sets: '60 min', rest: '—', yt: 'incline treadmill walk fat loss 60 minutos' },
+      { name: 'Inclinación: 12-15%', sets: '—', rest: '—', yt: 'caminata inclinada maxima cinta' },
+      { name: 'Velocidad: 4.5-5.5 km/h', sets: '—', rest: '—', yt: 'caminata inclinada ritmo correcto' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'thu', label: 'Jue', name: 'EMPUJE (HIPERTROFIA)', subtitle: 'Pecho superior · Hombros · Tríceps',
+    icon: '💪', color: 'var(--push)',
+    tip: 'Volumen y conexión mente-músculo. Inclinado a 30° (no 45°). Overhead extension = +40% cabeza larga tríceps vs pushdown.',
+    exercises: [
+      { name: '― CALENTAMIENTO ―', sets: '', rest: '', yt: '' },
+      { name: 'Arm Circles progresivos (pequeño→grande)', sets: '30 seg', rest: '—', yt: 'arm circles warm up progressive' },
+      { name: 'Band External Rotations (codo 90°)', sets: '12/lado', rest: '—', yt: 'band external rotation rotator cuff warm up' },
+      { name: 'Cat-Cow (cuadrupedia)', sets: '1×8', rest: '—', yt: 'cat cow thoracic mobility warm up' },
+      { name: 'Incline Push-Ups explosivos', sets: '1×8', rest: '—', yt: 'explosive incline push ups warm up chest' },
+      { name: '― PECHO ―', sets: '', rest: '', yt: '' },
+      { name: 'Press inclinado mancuernas (30°)', sets: '4×8-12', rest: '90s', yt: 'press inclinado mancuernas 30 grados tecnica' },
+      { name: 'Dips lastrados (inclinado = pecho)', sets: '3×6-12', rest: '90s', yt: 'dips lastrados inclinado pecho tecnica' },
+      { name: 'Cable Chest Fly (a la altura del pecho)', sets: '3×12-15', rest: '60s', yt: 'cable chest fly polea pecho tecnica' },
+      { name: '― HOMBROS ―', sets: '', rest: '', yt: '' },
+      { name: 'Cable Lateral Raise (1 brazo)', sets: '4×12-15', rest: '45s', yt: 'cable lateral raise un brazo deltoides tecnica' },
+      { name: 'DB Seated Overhead Press', sets: '3×8-12', rest: '90s', yt: 'seated dumbbell overhead press tecnica' },
+      { name: '― TRÍCEPS ―', sets: '', rest: '', yt: '' },
+      { name: 'Cable Overhead Tricep Extension (cuerda)', sets: '3×10-12', rest: '60s', yt: 'cable overhead tricep extension cuerda tecnica' },
+      { name: 'Cable Tricep Pushdown', sets: '3×12-15', rest: '60s', yt: 'cable tricep pushdown tecnica correcta' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Chin Tuck Isométrico (flexión craneocervical)', sets: '3×10 (hold 10s)', rest: '60s', yt: 'chin tuck exercise deep neck flexor training' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'fri', label: 'Vie', name: 'JALÓN (HIPERTROFIA)', subtitle: 'Espalda · Deltoide posterior · Bíceps',
+    icon: '🔗', color: 'var(--pull)',
+    tip: 'Dominadas lastradas primero. Face pulls son esenciales para salud del hombro. Aprieta omóplatos al final.',
+    exercises: [
+      { name: '― CALENTAMIENTO ―', sets: '', rest: '', yt: '' },
+      { name: 'Jumping jacks', sets: '45 seg', rest: '—', yt: 'jumping jacks warm up' },
+      { name: 'Band Pull-Aparts (agarre ancho + rot. ext.)', sets: '2×12', rest: '—', yt: 'band pull aparts wide grip external rotation' },
+      { name: 'Dead Hangs activos (depresión escapular)', sets: '2×5 seg', rest: '—', yt: 'active dead hang scapular depression' },
+      { name: 'Scapular Pull-Ups (sin flexión de codo)', sets: '1×8', rest: '—', yt: 'scapular pull ups activation warm up' },
+      { name: '― ESPALDA ―', sets: '', rest: '', yt: '' },
+      { name: 'Pull-Up / Chin-Up (lastradas)', sets: '4×5-10', rest: '90s', yt: 'weighted pull up chin up tecnica correcta' },
+      { name: 'Single-Arm DB Row (apoyado en banco)', sets: '3×10-12', rest: '75s', yt: 'remo unilateral mancuerna banco tecnica' },
+      { name: 'Seated Cable Row (agarre neutro)', sets: '3×10-12', rest: '75s', yt: 'seated cable row agarre neutro tecnica' },
+      { name: 'Chest-Supported T-Bar Row', sets: '3×8-12', rest: '75s', yt: 'chest supported t bar row tecnica' },
+      { name: '― DELTOIDE POSTERIOR ―', sets: '', rest: '', yt: '' },
+      { name: 'Cable Face Pull (cuerda)', sets: '4×15-20', rest: '45s', yt: 'cable face pull cuerda deltoide posterior tecnica' },
+      { name: '― BÍCEPS ―', sets: '', rest: '', yt: '' },
+      { name: 'Cable Curl (barra EZ)', sets: '3×10-12', rest: '60s', yt: 'cable curl barra ez biceps tecnica' },
+      { name: '― CORE ―', sets: '', rest: '', yt: '' },
+      { name: 'Cable Crunch (cuerda, de rodillas)', sets: '3×12-15', rest: '60s', yt: 'cable crunch cuerda rodillas abdominales tecnica' },
+      { name: '― ANTEBRAZOS ―', sets: '', rest: '', yt: '' },
+      { name: 'EZ Reverse Curl (de pie, estricto)', sets: '3×8-12', rest: '90s', yt: 'ez bar reverse curl brachioradialis technique' },
+      { name: 'Wrist Curl (barra EZ, borde del banco)', sets: '2×15-20', rest: '60s', yt: 'barbell wrist curl forearm technique' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Chin Tuck Isométrico (flexión craneocervical)', sets: '3×10 (hold 10s)', rest: '60s', yt: 'chin tuck exercise deep neck flexor training' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'sat', label: 'Sáb', name: 'PIERNAS (POSTERIOR)', subtitle: 'Deadlift · Isquios · Glúteos · Core',
+    icon: '🍑', color: 'var(--legs)',
+    tip: 'Peso muerto convencional primero (pesado). RDL con mancuernas para isquios. Seated leg curl > prono (Maeo 2024).',
+    exercises: [
+      { name: '― CALENTAMIENTO ―', sets: '', rest: '', yt: '' },
+      { name: 'Bici estacionaria o caminata rápida', sets: '2 min', rest: '—', yt: 'stationary bike warm up legs' },
+      { name: 'Hip Hinge con palo (good morning sin peso)', sets: '1×10', rest: '—', yt: 'hip hinge dowel good morning pattern drill' },
+      { name: 'Single-Leg Glute Bridge', sets: '8/lado', rest: '—', yt: 'single leg glute bridge activation warm up' },
+      { name: 'Inchworms', sets: '1×5', rest: '—', yt: 'inchworm exercise hamstring warm up' },
+      { name: '― ISQUIOTIBIALES ―', sets: '', rest: '', yt: '' },
+      { name: 'Conventional Deadlift (barra)', sets: '4×3-6', rest: '180s', yt: 'conventional deadlift barra tecnica correcta' },
+      { name: 'DB Romanian Deadlift (mancuernas)', sets: '3×8-10', rest: '90s', yt: 'dumbbell romanian deadlift rdl tecnica' },
+      { name: 'Seated Leg Curl (sentado > prono)', sets: '4×10-15', rest: '60s', yt: 'seated leg curl sentado maquina tecnica' },
+      { name: '― GLÚTEOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Bulgarian Split Squat (mancuernas)', sets: '3×8-12', rest: '90s', yt: 'bulgarian split squat mancuernas tecnica' },
+      { name: 'Hip Thrust (barra o máquina)', sets: '3×8-12', rest: '90s', yt: 'hip thrust barra maquina gluteos tecnica' },
+      { name: '― CORE ―', sets: '', rest: '', yt: '' },
+      { name: 'Suitcase Carry (1 brazo, anti-lateral)', sets: '3×30m/lado', rest: '60s', yt: 'suitcase carry un brazo core oblicuos tecnica' },
+      { name: '― CORRECTIVOS ―', sets: '', rest: '', yt: '' },
+      { name: 'Glute Bridge con Retroversión Pélvica', sets: '3×12-15 (hold 5s)', rest: '60s', yt: 'glute bridge posterior pelvic tilt technique' },
+      { name: 'Hip Flexor Stretch (half-kneeling)', sets: '3×45-60s/lado', rest: '—', yt: 'half kneeling hip flexor stretch technique' },
+    ]
+  },
+  {
+    id: 'sun', label: 'Dom', name: 'DESCANSO TOTAL', subtitle: 'Nutrición · Hidratación · Sueño',
+    icon: '😴', color: 'var(--rest)',
+    tip: 'La recuperación es donde se construye el músculo. Prioriza proteína, agua y 7-9h de sueño.',
+    exercises: [
+      { name: 'Descanso completo', sets: '24h', rest: '—', yt: 'importancia del descanso muscular' },
+    ]
+  }
+];
+
+// State
+let activeDay = new Date().getDay(); // 0=Sun
+// Map JS getDay (0=Sun) to our array (0=Mon)
+const dayMap = [6, 0, 1, 2, 3, 4, 5];
+activeDay = dayMap[activeDay];
+
+function getWeekId() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const days = Math.floor((now - jan1) / 86400000);
+  return now.getFullYear() + '-W' + Math.ceil((days + jan1.getDay() + 1) / 7);
+}
+
+function getChecks() {
+  const stored = JSON.parse(localStorage.getItem('gym_checks') || '{}');
+  const currentWeek = getWeekId();
+  if (stored._week !== currentWeek) {
+    const fresh = { _week: currentWeek };
+    localStorage.setItem('gym_checks', JSON.stringify(fresh));
+    return fresh;
+  }
+  return stored;
+}
+
+function saveChecks(checks) {
+  checks._week = getWeekId();
+  localStorage.setItem('gym_checks', JSON.stringify(checks));
+}
+
+function toggleExercise(dayId, idx) {
+  const checks = getChecks();
+  const key = `${dayId}_${idx}`;
+  checks[key] = !checks[key];
+  saveChecks(checks);
+  render();
+}
+
+function resetAll() {
+  saveChecks({});
+  render();
+}
+
+function toggleNotes() {
+  const body = document.getElementById('notesBody');
+  const toggle = document.getElementById('notesToggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+
+function render() {
+  const checks = getChecks();
+
+  // Content
+  const day = DAYS[activeDay];
+    const colorMap = {
+      'var(--upper)': '#eab308',
+      'var(--legs)': '#a855f7',
+      'var(--cardio)': '#14b8a6',
+      'var(--push)': '#f97316',
+      'var(--pull)': '#3b82f6',
+      'var(--rest)': '#6b7280'
+    };
+    const dayColorHex = colorMap[day.color] || '#4ade80';
+    document.body.style.setProperty('--day-color', dayColorHex);
+  const realExercises = day.exercises.filter(ex => !ex.name.startsWith('―'));
+  const total = realExercises.length;
+  let done = 0;
+  day.exercises.forEach((ex, i) => {
+    if (!ex.name.startsWith('―') && checks[`${day.id}_${i}`]) done++;
+  });
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const contentEl = document.getElementById('content');
+  contentEl.innerHTML = `
+    <div class="day-content active">
+      <div class="day-header">
+        <div class="day-icon" style="background:${day.color}22; color:${day.color}">
+          ${day.icon}
+        </div>
+        <div class="day-header-text">
+          <h2>${day.name}</h2>
+          <p>${day.subtitle}</p>
+        </div>
+      </div>
+
+      <div class="progress-section ${pct === 100 ? 'complete' : ''}">
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" viewBox="0 0 52 52">
+            <circle class="progress-ring-bg" cx="26" cy="26" r="22"/>
+            <circle class="progress-ring-fill" cx="26" cy="26" r="22"
+              stroke-dasharray="${2 * Math.PI * 22}"
+              stroke-dashoffset="${2 * Math.PI * 22 - (pct / 100) * 2 * Math.PI * 22}"/>
+          </svg>
+          <div class="progress-ring-text">${pct}%</div>
+        </div>
+        <div class="progress-info">
+          <div class="progress-label">${pct === 100 ? '¡Completado!' : done + '/' + total + ' ejercicios'}</div>
+          <div class="progress-sub">${pct === 100 ? 'Día terminado — gran trabajo 💪' : 'Sigue así'}</div>
+        </div>
+      </div>
+
+      <div class="tip">${day.tip}</div>
+
+      ${day.exercises.map((ex, i) => {
+        if (ex.name.startsWith('―')) {
+          return '<div class="section-label">' + ex.name + '</div>';
+        }
+        const isDone = checks[`${day.id}_${i}`];
+        const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.yt);
+        return '<div class="exercise ' + (isDone ? 'done' : '') + '" style="animation-delay:' + (i * 40) + 'ms">' +
+          '<div class="exercise-main">' +
+            '<div class="exercise-num" onclick="toggleExercise(\'' + day.id + '\', ' + i + ')">' + (i + 1) + '</div>' +
+            '<div class="exercise-info" onclick="toggleExercise(\'' + day.id + '\', ' + i + ')">' +
+              '<div class="exercise-name">' + ex.name + '</div>' +
+              '<div class="exercise-detail">' +
+                (ex.sets ? '<span class="badge badge-sets">' + ex.sets + '</span>' : '') +
+                (ex.rest && ex.rest !== '—' ? '<span class="badge badge-rest">⏱ ' + ex.rest + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            (ex.yt ? '<a class="yt-btn" href="' + ytUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' +
+              '<svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>' +
+            '</a>' : '') +
+            '<div class="exercise-check" onclick="toggleExercise(\'' + day.id + '\', ' + i + ')"></div>' +
+          '</div>' +
+        '</div>';
+      }).join('')}
+    </div>
+  `;
+}
+
+function setDay(idx) {
+  activeDay = idx;
+  render();
+  renderNav();
+}
+
+function renderNav() {
+  const navEl = document.getElementById('bottomNav');
+  while (navEl.firstChild) navEl.removeChild(navEl.firstChild);
+  DAYS.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn' + (i === activeDay ? ' active' : '');
+    btn.onclick = () => setDay(i);
+    const icon = document.createElement('span');
+    icon.className = 'nav-icon';
+    icon.textContent = d.icon;
+    const label = document.createElement('span');
+    label.textContent = d.label;
+    btn.appendChild(icon);
+    btn.appendChild(label);
+    navEl.appendChild(btn);
+  });
+}
+
+render();
+renderNav();
+
+</script>
+</body>
+</html>
