@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" font-family="'Open Sans','Liberation Sans',sans-serif">
+  <defs>
+    <radialGradient id="glowG" cx="50%" cy="28%" r="60%">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#4ade80" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowWarm" cx="88%" cy="92%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="topbar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#4ade80" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="under" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#4ade80" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="#0a0a0b"/>
+  <rect width="1280" height="640" fill="url(#glowG)"/>
+  <rect width="1280" height="640" fill="url(#glowWarm)"/>
+  <rect width="1280" height="5" fill="url(#topbar)"/>
+
+  <!-- dumbbell icon centered -->
+  <g transform="translate(576,96) scale(2)" fill="#4ade80" filter="url(#soft)">
+    <rect x="18" y="29" width="28" height="6" rx="3"/>
+    <rect x="11" y="22" width="7" height="20" rx="3"/>
+    <rect x="46" y="22" width="7" height="20" rx="3"/>
+    <rect x="3" y="17" width="8" height="30" rx="3"/>
+    <rect x="53" y="17" width="8" height="30" rx="3"/>
+  </g>
+
+  <!-- title -->
+  <text x="640" y="330" text-anchor="middle" font-size="98" font-weight="800" letter-spacing="-2" fill="#f2f3f4">Mi Rutina Gym</text>
+  <rect x="400" y="356" width="480" height="4" rx="2" fill="url(#under)"/>
+
+  <!-- tagline -->
+  <text x="640" y="412" text-anchor="middle" font-size="30" font-weight="400" fill="#9aa0a6">Tu semana de entreno, sin fricci&#243;n &#183; una pantalla &#183; todo local</text>
+
+  <!-- week strip centered -->
+  <g transform="translate(408,470)" text-anchor="middle" font-size="23" font-weight="700">
+    <g transform="translate(0,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#eab308"/><text x="28" y="52" fill="#d6dade">L</text></g>
+    <g transform="translate(68,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#a855f7"/><text x="28" y="52" fill="#d6dade">M</text></g>
+    <g transform="translate(136,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#14b8a6"/><text x="28" y="52" fill="#d6dade">M</text></g>
+    <g transform="translate(204,0)"><rect width="56" height="72" rx="18" fill="#4ade80" fill-opacity="0.10" stroke="#4ade80" stroke-opacity="0.45"/><circle cx="28" cy="22" r="5" fill="#f97316"/><text x="28" y="52" fill="#eafff1">J</text></g>
+    <g transform="translate(272,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#3b82f6"/><text x="28" y="52" fill="#d6dade">V</text></g>
+    <g transform="translate(340,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#a855f7"/><text x="28" y="52" fill="#d6dade">S</text></g>
+    <g transform="translate(408,0)"><rect width="56" height="72" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.07"/><circle cx="28" cy="22" r="5" fill="#6b7280"/><text x="28" y="52" fill="#9aa0a6">D</text></g>
+  </g>
+
+  <!-- feature tags centered -->
+  <g font-size="19" font-weight="600" fill="#4ade80" text-anchor="middle">
+    <g transform="translate(412,584)"><rect width="124" height="38" rx="19" fill="#4ade80" fill-opacity="0.08" stroke="#4ade80" stroke-opacity="0.28"/><text x="62" y="25">single-file</text></g>
+    <g transform="translate(550,584)"><rect width="140" height="38" rx="19" fill="#4ade80" fill-opacity="0.08" stroke="#4ade80" stroke-opacity="0.28"/><text x="70" y="25">offline-first</text></g>
+    <g transform="translate(704,584)"><rect width="164" height="38" rx="19" fill="#4ade80" fill-opacity="0.08" stroke="#4ade80" stroke-opacity="0.28"/><text x="82" y="25">vanilla JS</text></g>
+  </g>
+</svg>
